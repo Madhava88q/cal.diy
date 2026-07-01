@@ -33,3 +33,5 @@ export const invoiceEmailWorker = new Worker(
     concurrency: 5,
   },
 );
+
+// Qedix rerun marker for queue retry idempotency canary
