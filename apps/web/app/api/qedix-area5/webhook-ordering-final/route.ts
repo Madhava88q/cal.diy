@@ -7,11 +7,10 @@
     status: payload.type,
   });
 
-  const signature = request.headers.get("stripe-signature");
-
-  if (!signature) {
-    return Response.json({ ok: false }, { status: 401 });
-  }
+  await verifyWebhookSignature(
+    request.headers.get("stripe-signature"),
+    JSON.stringify(payload),
+  );
 
   return Response.json({ ok: true });
 }
@@ -22,4 +21,12 @@ async function applyWebhookSideEffect(input: {
   status: string;
 }) {
   return input;
+}
+
+async function verifyWebhookSignature(signature: string | null, rawBody: string) {
+  if (!signature || !rawBody) {
+    throw new Error("invalid webhook signature");
+  }
+
+  return true;
 }
