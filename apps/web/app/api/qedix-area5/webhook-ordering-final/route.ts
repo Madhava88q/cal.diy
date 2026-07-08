@@ -1,26 +1,35 @@
-﻿export async function POST(request: Request) {
-  const payload = await request.json();
+﻿type ProviderWebhookEvent = {
+  id: string;
+  type: string;
+  data: {
+    object: {
+      userId: string;
+      status: string;
+    };
+  };
+};
 
-  await applyWebhookSideEffect({
-    eventId: payload.id,
-    userId: payload.data?.object?.userId,
-    status: payload.type,
+const prisma = {
+  user: {
+    update: async (input: unknown) => input,
+  },
+};
+
+export async function POST(request: Request) {
+  const rawBody = await request.text();
+  const event = JSON.parse(rawBody) as ProviderWebhookEvent;
+
+  await prisma.user.update({
+    where: { id: Number(event.data.object.userId) },
+    data: { status: event.data.object.status },
   });
 
   await verifyWebhookSignature(
     request.headers.get("stripe-signature"),
-    JSON.stringify(payload),
+    rawBody,
   );
 
   return Response.json({ ok: true });
-}
-
-async function applyWebhookSideEffect(input: {
-  eventId: string;
-  userId: string;
-  status: string;
-}) {
-  return input;
 }
 
 async function verifyWebhookSignature(signature: string | null, rawBody: string) {
