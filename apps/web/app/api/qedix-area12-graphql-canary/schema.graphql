@@ -1,30 +1,33 @@
 ﻿type QedixArea12User {
   id: ID!
-  email: String!
-  name: String
+  name: String!
   status: QedixArea12UserStatus!
 }
 
 enum QedixArea12UserStatus {
   ACTIVE
   SUSPENDED
-  DELETED
 }
 
 input QedixArea12UserFilter {
   search: String
+  organizationId: ID!
 }
 
-type QedixArea12UserPayload {
+input QedixArea12UserInput {
+  name: String!
+}
+
+type QedixArea12UpdateUserPayload {
   ok: Boolean!
-  user: QedixArea12User
+  user: QedixArea12User!
 }
 
 type Query {
-  qedixArea12Users(filter: QedixArea12UserFilter): [QedixArea12User!]!
-  qedixArea12User(id: ID!): QedixArea12User
+  qedixArea12Users(filter: QedixArea12UserFilter, first: Int!): [QedixArea12User!]!
+  qedixArea12User(id: ID!): QedixArea12User!
 }
 
 type Mutation {
-  qedixArea12UpdateUser(id: ID!, name: String): QedixArea12UserPayload!
+  qedixArea12UpdateUser(id: ID!, profile: QedixArea12UserInput!): QedixArea12UpdateUserPayload!
 }
